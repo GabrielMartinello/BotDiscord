@@ -59,27 +59,27 @@ async def on_member_join(member):
     print(f'Bem vindo ... {new_member_name}')
     df = pd.DataFrame({"nome": [new_member_name]})
     
+    default_channel = member.guild.system_channel
+    
     # Consulta SQL para verificar se o nome já existe na tabela pessoa
     existing_data = botDao.getData_from_database(f"SELECT id, nome FROM pessoa WHERE nome = '{new_member_name}'")
     
     if not existing_data.empty:
         print(f"O nome '{new_member_name}' já existe na tabela pessoa. Não adicionando novamente.")
+        response = f'Ueeehh {new_member_name} quis voltar pra tentar meter o shape de novo? Bora bater essas asas frangao'
+        verificaCanal(response, default_channel)
         return
     
     sql = "INSERT INTO pessoa (nome) VALUES %s"
     botDao.insert_dataTable_by_comand(sql, df)
     print(f"Novo membro '{new_member_name}' adicionado à tabela pessoa.")
     
-    default_channel = member.guild.system_channel
+    # Envia uma mensagem de boas-vindas para o novo membro
+    response = f'Olá {new_member_name} seja bem vindo, seu frango! Estou te adicionando em nossa base de dados,'
+    response += 'vê se se esforça pra meter o shape, seu otário!'
     
-    if default_channel is not None:
-        # Envia uma mensagem de boas-vindas para o novo membro
-        response = f'Olá {new_member_name} seja bem vindo, seu frango! Estou te adicionando em nossa base de dados,'
-        response += 'vê se se esforça pra meter o shape, seu otário!'
-        await default_channel.send(response)
-    else:
-        print("Canal padrão para novos membros não encontrado.")
-        
+    verificaCanal(response, default_channel)
+
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
@@ -102,8 +102,13 @@ async def on_message(message):
                         await message.channel.send(f'Parabéns {message.author.name}! Sua presença acaba de ser confirmada!')
                         print(f"Mensagem com #euFui e uma imagem curtida por {bot.user.name}")
 
-        await bot.process_commands(message)         
-    existing_data = botDao.getData_from_database("SELECT id, nome FROM pessoa")                 
+        await bot.process_commands(message)    
+
+async def verificaCanal(message, default_channel):
+    if default_channel is not None:
+        await default_channel.send(message)
+    else:
+        print("Canal padrão para novos membros não encontrado.")                   
 
 # Pega o token do .env
 load_dotenv()
