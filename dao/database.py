@@ -76,14 +76,6 @@ def insert_data(
     else:
         conn.commit()        
 
-def get_column_names(
-    table: str,
-    cur: psycopg2.extensions.cursor
-) -> List[str]:
-    cursor.execute(
-        f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{table}';")
-    col_names = [result[0] for result in cursor.fetchall()]
-    return col_names
     
 def insert_data(
     query: str,
@@ -112,9 +104,9 @@ def get_column_names(
     table: str,
     cur: psycopg2.extensions.cursor
 ) -> List[str]:
-    cursor.execute(
+    cur.execute(
         f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{table}';")
-    col_names = [result[0] for result in cursor.fetchall()]
+    col_names = [result[0] for result in cur.fetchall()]
     return col_names
 
 
