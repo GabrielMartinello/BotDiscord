@@ -17,7 +17,7 @@ def load_connection_info(
 def create_db(
     conn_info: Dict[str, str],
 ) -> None:
-    # Connecta no banco pelo arquivo db.ini
+    # Connecta no banco pelo arquivo dao/db.ini
     psql_connection_string = f"user={conn_info['user']} password={conn_info['password']} port={conn_info['port']}"
     conn = psycopg2.connect(psql_connection_string)
     cur = conn.cursor()
@@ -149,55 +149,9 @@ def get_data_from_db(
         print(f"{type(error).__name__}: {error}")
         print("Query:", cur.query)
         conn.rollback()        
-        
-def create_table_by_command(sql):
-     # host, database, user, password
-    conn_info = load_connection_info("db.ini")
-
-    # Cria a conexao
-    create_db(conn_info)
-
-    # Conecta no banco
-    connection = psycopg2.connect(**conn_info)
-    cursor = connection.cursor()
-
-    create_table(sql, connection, cursor)
-
-    connection.close()
-    cursor.close()        
-    
-def insert_dataTable_by_comand(sql, df):
-    conn_info = load_connection_info("db.ini")
-    
-    connection = psycopg2.connect(**conn_info)
-    cursor = connection.cursor()
-
-    insert_data(sql, connection, cursor, df, 100)
-
-    connection.close()
-    cursor.close()    
-    
-def getData_from_database(query):
-    conn_info = load_connection_info("db.ini")
-
-    connection = psycopg2.connect(**conn_info)
-    cursor = connection.cursor()
-
-    col_names = get_column_names("pessoa", cursor)
-   
-    df = pd.DataFrame(columns=col_names)
-
-    dataF = get_data_from_db(query, connection, cursor, df, col_names)
-    print(dataF)
-
-    connection.close()
-    cursor.close()
-    
-    return dataF
-        
     
 if __name__ == "__main__":
-    conn_info = load_connection_info("db.ini")
+    conn_info = load_connection_info("dao/db.ini")
 
     # Cria a conexao
     create_db(conn_info)
