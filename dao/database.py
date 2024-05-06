@@ -99,7 +99,7 @@ def get_data_from_db(
             # Fetch the next 100 rows
             query_results = cur.fetchmany(100)
             # If an empty list is returned, then we've reached the end of the results
-            if query_results == list():
+            if not query_results:
                 break
 
             # Create a list of dictionaries where each dictionary represents a single row
@@ -108,15 +108,18 @@ def get_data_from_db(
                 for row in query_results
             ]
 
-            # Append the fetched rows to the DataFrame
-            df = df.append(results_mapped, ignore_index=True)
+            # Convert the list of dictionaries to a DataFrame
+            temp_df = pd.DataFrame(results_mapped)
+
+            # Concatenate the fetched rows to the existing DataFrame
+            df = pd.concat([df, temp_df], ignore_index=True)
 
         return df
 
     except Exception as error:
         print(f"{type(error).__name__}: {error}")
         print("Query:", cur.query)
-        conn.rollback()        
+        conn.rollback()     
     
 if __name__ == "__main__":
     conn_info = load_connection_info("dao/db.ini")

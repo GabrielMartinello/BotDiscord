@@ -41,10 +41,7 @@ async def listar_comandos(ctx):
 
 @bot.command()
 async def regras(ctx):
-    response =  '1. - Só vai contar como presença se a foto for postada no grupo com a tag #euFui!\n'
-    response += '2. - Sua palavra pode valer alguma coisa, mas nesse grupo não! Somente fotos comprovam a presença\n'
-    response += '3. - O ganhador receberá 10 reais de cada membro do grupo.'
-    await ctx.send(response)
+    await ctx.send(mensagemRegras())
     
 @bot.command()
 async def criar_tabelas_pg(ctx):    
@@ -63,22 +60,34 @@ async def on_member_join(member):
     
     # Consulta SQL para verificar se o nome já existe na tabela pessoa
     existing_data = botDao.getData_from_database(f"SELECT id, nome FROM pessoa WHERE nome = '{new_member_name}'")
+    print("Nome ", new_member_name)
+    print("Teste ", existing_data)
     
-    if not existing_data.empty:
+    if existing_data is not None and not existing_data.empty:
         print(f"O nome '{new_member_name}' já existe na tabela pessoa. Não adicionando novamente.")
         response = f'Ueeehh {new_member_name} quis voltar pra tentar meter o shape de novo? Bora bater essas asas frangao'
-        verificaCanal(response, default_channel)
+
+        if default_channel is not None:
+            await default_channel.send(response)
+        else:
+            print("Canal padrão para novos membros não encontrado.")     
+            
         return
     
     sql = "INSERT INTO pessoa (nome) VALUES %s"
     botDao.insert_dataTable_by_comand(sql, df)
     print(f"Novo membro '{new_member_name}' adicionado à tabela pessoa.")
     
-    # Envia uma mensagem de boas-vindas para o novo membro
     response = f'Olá {new_member_name} seja bem vindo, seu frango! Estou te adicionando em nossa base de dados,'
-    response += 'vê se se esforça pra meter o shape, seu otário!'
+    response += 'vê se se esforça pra meter o shape, seu otário!\n'
+    response += 'Regras:\n'
+    response += mensagemRegras()
     
-    verificaCanal(response, default_channel)
+    if default_channel is not None:
+        await default_channel.send(response)
+    else:
+        print("Canal padrão para novos membros não encontrado.")     
+
 
 @bot.event
 async def on_message(message):
@@ -102,14 +111,14 @@ async def on_message(message):
                         await message.channel.send(f'Parabéns {message.author.name}! Sua presença acaba de ser confirmada!')
                         print(f"Mensagem com #euFui e uma imagem curtida por {bot.user.name}")
 
-        await bot.process_commands(message)    
-
-async def verificaCanal(message, default_channel):
-    if default_channel is not None:
-        await default_channel.send(message)
-    else:
-        print("Canal padrão para novos membros não encontrado.")                   
-
+        await bot.process_commands(message)
+        
+def mensagemRegras():
+    response =  '1. - Só vai contar como presença se a foto for postada no grupo com a tag #euFui!\n'
+    response += '2. - Sua palavra pode valer alguma coisa, mas nesse grupo não! Somente fotos comprovam a presença\n'
+    response += '3. - O ganhador receberá 10 reais de cada membro do grupo.'
+    return response            
+                 
 # Pega o token do .env
 load_dotenv()
 print(os.getenv('TOKEN'))
