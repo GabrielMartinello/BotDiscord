@@ -66,7 +66,18 @@ async def on_message(message):
 
 @tasks.loop(hours=24)
 async def verificar_vencedor():
-    if datetime.now().day == 5:
+    data_atual = datetime.now().date()
+    mes_passado = data_atual.month - 1
+                                
+    if mes_passado == 0:
+        mes_passado = 12
+        ano_passado = data_atual.year - 1
+    else:
+        ano_passado = data_atual.year
+        
+    data_mes_passado = datetime(ano_passado, mes_passado, 1).date()      
+      
+    if data_atual.day == 15:
         channel = bot.get_channel(CHANNEL_ID)
         if channel:
             response = 'Salve, hoje é o dia de mostrar o vencedor CARAAALEEEOOO\n'
@@ -74,14 +85,32 @@ async def verificar_vencedor():
             users_data = ref.get()
 
             if users_data:
-                user_record_counts = {user_id: len(user_info) for user_id, user_info in users_data.items()}
+                user_record_counts = {}
+                for user_id, user_info in users_data.items():
+                    if isinstance(user_info, dict):
+                        for registro_key, registro_data in user_info.items():
+                            if isinstance(registro_data, dict) and 'Checkin' in registro_data:
+                                checkin_date = datetime.strptime(registro_data['Checkin'], '%Y-%m-%d %H:%M:%S').date()
+                                print(checkin_date, checkin_date.month, data_mes_passado, data_mes_passado.month)
+                                if checkin_date.month == data_mes_passado.month and checkin_date.year == data_mes_passado.year:
+                                    user_record_counts[user_id] = user_record_counts.get(user_id, 0) + 1
 
+                vencedor = ''
                 if user_record_counts:
-                    vencedor_id = max(user_record_counts, key=user_record_counts.get)
-                    vencedor_registros = user_record_counts[vencedor_id]
-                    response += f'O vencedor é o usuário {vencedor_id} com {vencedor_registros} registros!\n'
+                    top_users = sorted(user_record_counts.items(), key=lambda x: x[1], reverse=True)[:3]
+                    
+                    # Montar a mensagem com o top 3 vencedores
+                    for i, (user_id, record_count) in enumerate(top_users, start=1):
+                        if i == 1:
+                            response += f'{i}. - Usuário {user_id} com {record_count} registros (VENCEDOOOOOOR)\n'
+                            vencedor = user_id
+                        else:
+                            response += f'{i}. - Usuário {user_id} com {record_count} registros\n'
+                            
+                    if vencedor: 
+                        response += mensagemParabens(vencedor)                          
                 else:
-                    response += 'Nenhum registro encontrado.\n'
+                    response += 'Nenhum registro encontrado no período anterior.\n'
             else:
                 response += 'Nenhum usuário encontrado no banco de dados.\n'
 
@@ -93,6 +122,12 @@ def mensagemRegras():
     response =  '1. - Só vai contar como presença se a foto for postada no grupo com a tag #euFui!\n'
     response += '2. - Sua palavra pode valer alguma coisa, mas nesse grupo não! Somente fotos comprovam a presença\n'
     response += '3. - O ganhador receberá 10 reais de cada membro do grupo.'
+    return response
+
+def mensagemParabens(usuario):
+    response =  f'Parabéns {usuario} seu frangote que fica enchendo a academia no verão, pelo menos você emagreceu uns kilos e chegou mais perto de alcançar o shape\n'
+    response += 'Vê se continua assim, não para não meu querido!!!! Chris Bambister saindo, FIVE TIMES MR OLYMPIAANN!!\n'
+    response += '---------------------------------------------------------------------------------------'
     return response
 
 load_dotenv()
