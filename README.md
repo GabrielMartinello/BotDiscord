@@ -11,7 +11,11 @@ Este projeto foi desenvolvido com intuito de ajudar um grupo de amigos a control
 #
 
 ### Contagem de presenças
-Para que o bot registre sua presença, você precisa enviar uma foto e na mensagem desta foto colocar a tag #euFui, ele irá verificar se teve uma foto e se a foto possui esta mensagem, consequentemente irá salvar no banco de dados do firebase
+Para que o bot registre sua presença, você precisa enviar uma foto e na mensagem desta foto colocar a tag #euFui.
+
+![Alt text](/src/contagemPresenca.jpg?raw=true "Presenca")
+
+Ele irá verificar se teve uma foto e se a foto possui esta mensagem,consequentemente irá salvar no banco de dados do firebase
 
 ![Alt text](/src/bancoDeDadosFirebase.jpg?raw=true "Banco de Dados")
 
