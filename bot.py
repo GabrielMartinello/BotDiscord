@@ -31,11 +31,6 @@ async def on_ready():
         
 
 @bot.command()
-async def listar_comandos(ctx):
-    response = 'Aqui estão alguns comandos que você pode solicitar para mim: \n!cumprimentos - Faz eu me apresentar'
-    await ctx.send(response)
-
-@bot.command()
 async def regras(ctx):
     await ctx.send(mensagemRegras())
 
@@ -106,7 +101,7 @@ async def verificar_vencedor():
         
     data_mes_passado = datetime(ano_passado, mes_passado, 1).date()      
       
-    if data_atual.day == 16:
+    if data_atual.day == 1:
         channel = bot.get_channel(CHANNEL_ID)
         if channel:
             response = 'Salve, hoje é o dia de mostrar o vencedor CARAAALEEEOOO\n'
