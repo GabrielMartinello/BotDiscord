@@ -1,4 +1,5 @@
 O Projeto foi desenvolvido com Python 3.11.5.
+
 Bibliotecas utilizadas:
 * discord - Biblioteca para enviar/ler comandos do discord
 * os, dotenv - Pegar valores do .env
