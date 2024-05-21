@@ -21,7 +21,14 @@ joinha = '\N{THUMBS UP SIGN}'
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
-    verificar_vencedor.start()
+    
+    channel = bot.get_channel(CHANNEL_ID)
+    if channel:
+        await varrer_mensagens_do_mes(channel)
+        verificar_vencedor.start()   
+    else:
+        print(f'Canal com ID {CHANNEL_ID} não encontrado.')
+        
 
 @bot.command()
 async def listar_comandos(ctx):
@@ -31,6 +38,28 @@ async def listar_comandos(ctx):
 @bot.command()
 async def regras(ctx):
     await ctx.send(mensagemRegras())
+
+async def varrer_mensagens_do_mes(channel):
+     current_month = datetime.now().month
+     current_year = datetime.now().year
+
+     async for message in channel.history(limit=None): 
+        message_date = message.created_at
+        message_month = message_date.month
+        message_year = message_date.year
+        
+        # Se a mensagem não for do mês e ano atuais, interrompe a iteração
+        if message_month != current_month or message_year != current_year:
+            break
+        
+        if "#euFui" in message.content and message.attachments:
+            if not any(reaction.emoji == joinha and reaction.me for reaction in message.reactions):
+                for attachment in message.attachments:
+                    if any(ext in attachment.url.upper() for ext in ('PNG', 'JPG', 'JPEG', 'GIF')):
+                        dataAtual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        users_ref.child("Users").child(str(message.author)).push({"Checkin": dataAtual})
+                        await message.add_reaction(joinha)
+                        await message.reply(f'Parabéns {message.author.name}! Sua presença acaba de ser confirmada!')
 
 @bot.event
 async def on_member_join(member):
@@ -77,7 +106,7 @@ async def verificar_vencedor():
         
     data_mes_passado = datetime(ano_passado, mes_passado, 1).date()      
       
-    if data_atual.day == 15:
+    if data_atual.day == 16:
         channel = bot.get_channel(CHANNEL_ID)
         if channel:
             response = 'Salve, hoje é o dia de mostrar o vencedor CARAAALEEEOOO\n'
