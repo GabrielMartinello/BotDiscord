@@ -59,7 +59,7 @@ async def varrer_mensagens_do_mes(channel):
                         dataAtual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         users_ref.child("Users").child(str(message.author)).push({"Checkin": dataAtual})
                         await message.add_reaction(joinha)
-                        await message.reply(f'Parabéns {message.author.name}! Sua presença acaba de ser confirmada!')
+                        await message.reply(f'Parabéns {message.author.name}! Sua presença acaba de ser confirmada, seu frangolino!')
 
 @bot.event
 async def on_member_join(member):
@@ -89,7 +89,7 @@ async def on_message(message):
                     dataAtual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     users_ref.child("Users").child(str(message.author)).push({"Checkin": dataAtual})
                     await message.add_reaction(joinha)
-                    await message.channel.send(f'Parabéns {message.author.name}! Sua presença acaba de ser confirmada!')
+                    await message.channel.send(f'Parabéns {message.author.name}! Sua presença acaba de ser confirmada, seu frangolino!')
 
         await bot.process_commands(message)
 
