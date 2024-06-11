@@ -47,14 +47,15 @@ async def varrer_mensagens_do_mes(channel):
         if message_month != current_month or message_year != current_year:
             break
         
-        if "#euFui" in message.content and message.attachments:
-            if not any(reaction.emoji == joinha and reaction.me for reaction in message.reactions):
-                for attachment in message.attachments:
-                    if any(ext in attachment.url.upper() for ext in ('PNG', 'JPG', 'JPEG', 'GIF')):
-                        dataAtual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                        users_ref.child("Users").child(str(message.author)).push({"Checkin": dataAtual})
-                        await message.add_reaction(joinha)
-                        await message.reply(f'Parabéns {message.author.name}! Sua presença acaba de ser confirmada, seu frangolino!')
+        if "#euFui" in message.content:
+            if message.attachments:
+                if not any(reaction.emoji == joinha and reaction.me for reaction in message.reactions):
+                    for attachment in message.attachments:
+                        if any(ext in attachment.url.upper() for ext in ('PNG', 'JPG', 'JPEG', 'GIF', 'WEBP')):
+                            dataAtual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                            users_ref.child("Users").child(str(message.author)).push({"Checkin": dataAtual})
+                            await message.add_reaction(joinha)
+                            await message.reply(f'Parabéns {message.author.name}! Sua presença acaba de ser confirmada, seu frangolino!')
 
 @bot.event
 async def on_member_join(member):
